@@ -2,6 +2,11 @@
 
 namespace Roura\Alicloud\V20150109;
 
+/**
+ * Class AlicloudUpdateRecord
+ *
+ * @package Roura\Alicloud\V20150109
+ */
 class AlicloudUpdateRecord
 {
     public $rR;
@@ -12,13 +17,23 @@ class AlicloudUpdateRecord
     public $accessKeyId;
     public $accessKeySecret;
 
-    function __construct($accessKeyId, $accessKeySecret)
+    /**
+     * AlicloudUpdateRecord constructor.
+     *
+     * @param String $accessKeyId
+     * @param String $accessKeySecret
+     */
+    function __construct(String $accessKeyId, String $accessKeySecret)
     {
         $this->accessKeyId     = $accessKeyId;
         $this->accessKeySecret = $accessKeySecret;
     }
 
-    public function getSignature($CanonicalQueryString): string
+    /**
+     * @param String $CanonicalQueryString
+     * @return string
+     */
+    public function getSignature(String $CanonicalQueryString): string
     {
         $HTTPMethod                  = 'GET';
         $slash                       = urlencode('/');
@@ -26,12 +41,13 @@ class AlicloudUpdateRecord
         $StringToSign                = "{$HTTPMethod}&{$slash}&{$EncodedCanonicalQueryString}";
         $StringToSign                = str_replace('%40', '%2540', $StringToSign);
         $HMAC                        = hash_hmac('sha1', $StringToSign, "{$this->accessKeySecret}&", true);
-        $base64HMAC                  = base64_encode($HMAC);
-        $urlbase64HMAC               = urlencode($base64HMAC);
 
-        return $urlbase64HMAC;
+        return base64_encode($HMAC);
     }
 
+    /**
+     * @return string
+     */
     public function getDate(): string
     {
         $timestamp = date('U');
@@ -43,26 +59,42 @@ class AlicloudUpdateRecord
         return "{$date}T{$H}%3A{$i}%3A{$s}";
     }
 
-    public function setValue($value)
+    /**
+     * @param String $value
+     */
+    public function setValue(String $value)
     {
         $this->value = $value;
     }
 
-    public function setRR($rR)
+    /**
+     * @param String $rR
+     */
+    public function setRR(String $rR)
     {
         $this->rR = $rR;
     }
 
-    public function setRecordId($recordId)
+    /**
+     * @param String $recordId
+     */
+    public function setRecordId(String $recordId)
     {
         $this->recordId = $recordId;
     }
 
-    public function setRecordType($type)
+    /**
+     * @param String $type
+     */
+    public function setRecordType(String $type)
     {
         $this->type = $type;
     }
 
+    /**
+     * @return array
+     * @throws \Exception
+     */
     public function sendRequest(): array
     {
         $queries = [
@@ -89,7 +121,7 @@ class AlicloudUpdateRecord
         }
 
         $signature  = $this->getSignature($CanonicalQueryString);
-        $requestUrl = "http://dns.aliyuncs.com/?{$CanonicalQueryString}&Signature={$signature}";
+        $requestUrl = "http://dns.aliyuncs.com/?{$CanonicalQueryString}&Signature=" . urlencode($signature);
         $response   = file_get_contents($requestUrl, false, stream_context_create([
             'http' => [
                 'ignore_errors' => true
