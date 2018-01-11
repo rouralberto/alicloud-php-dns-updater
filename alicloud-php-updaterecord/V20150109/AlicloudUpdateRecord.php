@@ -2,6 +2,8 @@
 
 namespace Roura\Alicloud\V20150109;
 
+use \Exception;
+
 /**
  * Class AlicloudUpdateRecord
  *
@@ -9,8 +11,8 @@ namespace Roura\Alicloud\V20150109;
  */
 class AlicloudUpdateRecord
 {
+    public $domainName;
     public $rR;
-    public $recordId;
     public $type;
     public $value;
     public $tTL;
@@ -60,6 +62,49 @@ class AlicloudUpdateRecord
     }
 
     /**
+     * @throws Exception
+     */
+    public function getRecordId()
+    {
+        $queries = [
+            'AccessKeyId' => $this->accessKeyId,
+            'Action' => 'DescribeDomainRecords',
+            'DomainName' => $this->domainName,
+            'Format' => 'json',
+            'SignatureMethod' => 'HMAC-SHA1',
+            'SignatureNonce' => random_int(1000000000, 9999999999),
+            'SignatureVersion' => '1.0',
+            'Timestamp' => $this->getDate(),
+            'Version' => '2015-01-09'
+        ];
+
+        $response = $this->doRequest($queries);
+
+        $recordList = $response['DomainRecords']['Record'];
+
+        $RR = null;
+        foreach ($recordList as $key => $record) {
+            if ($this->rR === $record['RR']) {
+                $RR = $record;
+            }
+        }
+
+        if ($RR === null) {
+            die('RR ' . $this->rR . ' not found.');
+        }
+
+        return $RR['RecordId'];
+    }
+
+    /**
+     * @param String $domainName
+     */
+    public function setDomainName(String $domainName)
+    {
+        $this->domainName = $domainName;
+    }
+
+    /**
      * @param String $value
      */
     public function setValue(String $value)
@@ -92,26 +137,11 @@ class AlicloudUpdateRecord
     }
 
     /**
+     * @param array $queries
      * @return array
-     * @throws \Exception
      */
-    public function sendRequest(): array
+    public function doRequest(Array $queries): array
     {
-        $queries = [
-            'AccessKeyId' => $this->accessKeyId,
-            'Action' => 'UpdateDomainRecord',
-            'Format' => 'json',
-            'RR' => $this->rR,
-            'RecordId' => $this->recordId,
-            'SignatureMethod' => 'HMAC-SHA1',
-            'SignatureNonce' => random_int(1000000000, 9999999999),
-            'SignatureVersion' => '1.0',
-            'Timestamp' => $this->getDate(),
-            'Type' => $this->type,
-            'Value' => $this->value,
-            'Version' => '2015-01-09'
-        ];
-
         $CanonicalQueryString = '';
         $i                    = 0;
         foreach ($queries as $param => $query) {
@@ -129,5 +159,29 @@ class AlicloudUpdateRecord
         ]));
 
         return json_decode($response, true);
+    }
+
+    /**
+     * @return array
+     * @throws \Exception
+     */
+    public function sendRequest(): array
+    {
+        $queries = [
+            'AccessKeyId' => $this->accessKeyId,
+            'Action' => 'UpdateDomainRecord',
+            'Format' => 'json',
+            'RR' => $this->rR,
+            'RecordId' => $this->getRecordId(),
+            'SignatureMethod' => 'HMAC-SHA1',
+            'SignatureNonce' => random_int(1000000000, 9999999999),
+            'SignatureVersion' => '1.0',
+            'Timestamp' => $this->getDate(),
+            'Type' => $this->type,
+            'Value' => $this->value,
+            'Version' => '2015-01-09'
+        ];
+
+        return $this->doRequest($queries);
     }
 }
