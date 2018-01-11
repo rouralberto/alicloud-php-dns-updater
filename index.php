@@ -4,14 +4,15 @@ date_default_timezone_set('UTC');
 
 include_once 'alicloud-php-updaterecord/V20150109/AlicloudUpdateRecord.php';
 
+use Roura\Alicloud\V20150109\AlicloudUpdateRecord;
+
 $AccessKeyId     = 'ACCESS_KEY_ID';
 $AccessKeySecret = 'ACCESS_KEY_SECRET';
+$updater         = new AlicloudUpdateRecord($AccessKeyId, $AccessKeySecret);
 
-$newIp = 'xxx.xxx.xxx.xxx'; // New IP
+$newIp = $_SERVER['REMOTE_ADDR']; // New IP
 
-$updater = new Roura\Alicloud\V20150109\AlicloudUpdateRecord($AccessKeyId, $AccessKeySecret);
-
-$updater->setRecordId('XXXXXXXXXXXXXXXX');
+$updater->setDomainName('DOMAIN.COM');
 $updater->setRecordType('A');
 $updater->setRR('@');
 $updater->setValue($newIp);
