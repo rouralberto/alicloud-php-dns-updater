@@ -11,31 +11,55 @@ use \Exception;
  */
 class AlicloudUpdateRecord
 {
+    /**
+     * @var string
+     */
     public $domainName;
+
+    /**
+     * @var string
+     */
     public $rR;
+
+    /**
+     * @var string
+     */
     public $type;
+
+    /**
+     * @var string
+     */
     public $value;
-    public $tTL;
+
+    /**
+     * @var string
+     */
     public $accessKeyId;
+
+    /**
+     * @var string
+     */
     public $accessKeySecret;
 
     /**
      * AlicloudUpdateRecord constructor.
      *
-     * @param String $accessKeyId
-     * @param String $accessKeySecret
+     * @param string $accessKeyId
+     * @param string $accessKeySecret
      */
-    function __construct(String $accessKeyId, String $accessKeySecret)
-    {
+    function __construct(
+        string $accessKeyId,
+        string $accessKeySecret
+    ) {
         $this->accessKeyId     = $accessKeyId;
         $this->accessKeySecret = $accessKeySecret;
     }
 
     /**
-     * @param String $CanonicalQueryString
+     * @param string $CanonicalQueryString
      * @return string
      */
-    public function getSignature(String $CanonicalQueryString): string
+    public function getSignature(string $CanonicalQueryString): string
     {
         $HTTPMethod                  = 'GET';
         $slash                       = urlencode('/');
@@ -62,9 +86,10 @@ class AlicloudUpdateRecord
     }
 
     /**
+     * @return string
      * @throws Exception
      */
-    public function getRecordId()
+    public function getRecordId(): string
     {
         $queries = [
             'AccessKeyId' => $this->accessKeyId,
@@ -97,41 +122,41 @@ class AlicloudUpdateRecord
     }
 
     /**
-     * @param String $domainName
+     * @param string $domainName
      */
-    public function setDomainName(String $domainName)
+    public function setDomainName(string $domainName)
     {
         $this->domainName = $domainName;
     }
 
     /**
-     * @param String $value
+     * @param string $value
      */
-    public function setValue(String $value)
+    public function setValue(string $value)
     {
         $this->value = $value;
     }
 
     /**
-     * @param String $rR
+     * @param string $rR
      */
-    public function setRR(String $rR)
+    public function setRR(string $rR)
     {
         $this->rR = $rR;
     }
 
     /**
-     * @param String $recordId
+     * @param string $recordId
      */
-    public function setRecordId(String $recordId)
+    public function setRecordId(string $recordId)
     {
         $this->recordId = $recordId;
     }
 
     /**
-     * @param String $type
+     * @param string $type
      */
-    public function setRecordType(String $type)
+    public function setRecordType(string $type)
     {
         $this->type = $type;
     }
